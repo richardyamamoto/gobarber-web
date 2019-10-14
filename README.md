@@ -9,6 +9,7 @@ ___
 - [Configuring Reactotron](#configreactotron)
 - [Private Routes](#privateroutes)
 - [Layouts for Pages](#layoutspages)
+- [Global Styles](#globalstyles)
 
 ___
 
@@ -274,4 +275,17 @@ return (
   )}/>
 );
 ```
+___
+
+## Global Styles
+<div id="globalstyles">
+Create [src/styles/Global.js](src/styles/Global.js)
+
+Import the method `createGlobalStyle` from Styled-components then export default
+```js
+import { createGlobalStyle } from 'styled-components';
+
+export default createGlobalStyle``;
+```
+For further details [Global.js](src/styles/Global.js)
 ___
