@@ -5,6 +5,9 @@ ___
 
 ## Index
 - [Environment Configuration](#environment)
+- [Setting Routes](#routes)
+- [Configuring Reactotron](#configreactotron)
+- [Private Routes](#privateroutes)
 
 ___
 
@@ -32,7 +35,7 @@ We use Eslint and Prettier to organize our code to become easier to read and hav
 ___
 
 ## Setting Routes
-
+<div id="routes">
 Install React router dom
 ```bash
 yarn add react-router-dom
@@ -121,9 +124,8 @@ const history = createBrowserHistory();
 export default history;
 ```
 ___
-
 ## Configuring Reactotron
-
+<div id="configreactotron">
 Install the integration of Reactotron with ReactJS
 
 ```bash
@@ -139,5 +141,79 @@ import './config/ReactotronConfig';
 Initialize the application to check if Reactotron is connected
 ```js
 yarn start
+```
+___
+
+## Private Routes
+<div id="privateroutes">
+We are going create private routes that will allow users to navigate only with validation.
+
+First create [Route.js](src/routes/Route.js) at `src/routes/`
+
+Import:
+```js
+import React from 'react';
+import { Route, Redirect } from 'react-router-dom';
+
+```
+Create the function component RouteWrapper
+
+Then recover the properties of the components by unstructuring the parameters and inside the function verify if the user is signed and if the route is private.
+```js
+export default function RouteWrapper({
+  component:Component,
+  isPrivate = false,
+  ...rest,
+  }) {
+    const signed = false,
+    if(!signed && isPrivate) {
+      return <Redirect to="/" />
+    };
+    if(signed && !isPrivate) {
+      return <Redirect to="dashboard"/>
+    }
+    return <Route {...rest} component={Component}/>
+  }
+```
+>The constant `signed` is static only for test.
+
+Install Prop-Types
+```bash
+yarn add prop-types
+```
+Import Prop-Types
+```js
+import PropTypes from 'prop-types';
+```
+Then validate and create default value for `component` and `isPrivate`
+```js
+RouteWrapper.propTypes = {
+  component: PropTypes.oneOfType([PropTypes.element, PropTypes.func]).isRequired,
+  isPrivate: PropTypes.bool,
+}
+
+RouterWrapper.defaultProps = {
+  isPrivate: false,
+}
+```
+
+At [src/routes/index.js](src/routes/index.js)
+
+Delete the importation of Route from react-router-dom and import the Route component we created.
+```js
+import { Switch } from 'react-router-dom';
+import Route from './Route';
+```
+Place the property `isPrivate` on Dashboard and Profile component
+```js
+export default function Routes() {
+  return (
+    <Switch>
+      ...
+      <Route path="/dashboard" component={Dashboard} isPrivate />
+      <Route path="/profile" component={Profile} isPrivate />
+    </Switch>
+  );
+}
 ```
 ___
