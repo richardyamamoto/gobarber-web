@@ -121,3 +121,23 @@ const history = createBrowserHistory();
 export default history;
 ```
 ___
+
+## Configuring Reactotron
+
+Install the integration of Reactotron with ReactJS
+
+```bash
+yarn add reactotron-react-js
+```
+Create the folder `config` inside `src` and the configuration file.
+[src/config/ReactotronConfig.js](src/config/ReactotronConfig.js)
+
+Then at [src/App.js](src/App.js) import the ReacotronConfig inside
+```js
+import './config/ReactotronConfig';
+```
+Initialize the application to check if Reactotron is connected
+```js
+yarn start
+```
+___
