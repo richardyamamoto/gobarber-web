@@ -31,3 +31,93 @@ We use Eslint and Prettier to organize our code to become easier to read and hav
 - Paste inside these files the commands on this link: [Configuration files](https://gist.github.com/richardyamamoto/d884e24dc86ccc636d2d69bac6660486)
 ___
 
+## Setting Routes
+
+Install React router dom
+```bash
+yarn add react-router-dom
+```
+Install the history to navigate the user
+```
+yarn add history
+```
+Create the following folders inside `src`.
+- src
+  - pages
+    - Dashboard
+      - index.js
+    - Profile
+      - index.js
+    - SignIn
+      - index.js
+    - SignUp
+      - index.js
+  - routes
+    - index.js
+  - services
+    - history.js
+
+Inside each page `index.js` create a **react function component(rfc)**
+
+Now on [src/routes/index.js](src/routes/index.js)
+
+Import:
+```js
+import React from 'react';
+import { Switch, Routes } from 'react-router-dom';
+// Pages
+import SignIn from '../pages/SignIn/index';
+import SignUp from '../pages/SignUp';
+import Profile from '../pages/Profile';
+import Dashboard from '../pages/Dashboard';
+```
+Then export the function Routes, returning jsx.
+```jsx
+export default function Routes() {
+  return (
+   <Switch>
+      <Route path="/" exact component={SignIn} />
+      <Route path="/register" component={SignUp} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/profile" component={Profile} />
+    </Switch>
+  )
+}
+```
+Switch must be outside every component route.
+
+>The `exact` property is used to the exact route being read.
+
+Now on [src/App.js](src/App.js)
+
+Import:
+```js
+import { Router } from 'react-router-dom';
+import Routes from './routes';
+import history from './services/history';
+```
+The Router component has the property `history` that receive `history`, and must be outside Routes component.
+```js
+function App() {
+  return (
+    <Router history={history}>
+      <Routes />
+    </Router>
+  );
+}
+```
+>Every `history.push()` will be listened by Router.
+
+To make this happen we need to create the history file.
+
+At [src/services/history.js](src/services/history.js)
+
+Import and create:
+```js
+import { createBrowserHistory } from 'history'
+
+const history = createBrowserHistory();
+
+export default history;
+```
+___
