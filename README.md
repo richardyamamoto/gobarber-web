@@ -8,6 +8,7 @@ ___
 - [Setting Routes](#routes)
 - [Configuring Reactotron](#configreactotron)
 - [Private Routes](#privateroutes)
+- [Layouts for Pages](#layoutspages)
 
 ___
 
@@ -215,5 +216,62 @@ export default function Routes() {
     </Switch>
   );
 }
+```
+___
+
+## Pages Layouts
+<div id="layoutspages">
+Layouts works analog to templates.
+
+Create another folder inside `src/pages` named `_layouts`.
+
+And create `auth/index.js` and `default/index.js` inside `_layouts`
+
+>- src
+>   - pages
+>     - _layouts
+>       - auth
+>         - index.js
+>       - default
+>         - index.js
+
+Install Styled Components
+```bash
+yarn add styled-components
+```
+On [src/pages/_layouts/auth/index.js](src/pages/_layouts/auth/index.js)
+
+Create a react function component named AuthLayout. On parameters of the function, recover the `children` by unstructuring. Then put it between the Styled Component.
+```js
+export default function AuthLayout({ children }) {
+  return <Wrapper>{ children }</Wrapper>;
+}
+```
+Create the styled component file: [src/pages/_layouts/auth/styles.js](src/pages/_layouts/auth/styles.js)
+
+Make the same process to default layout.
+
+Then on [src/routes/Route.js](src/routes/Route.js)
+
+Import layouts:
+```js
+import AuthLayout from '../pages/_layouts/auth';
+import DefaultLayout from '../pages/_layouts/default';
+```
+And right before the last return, create a constant called `Layout` that will become our layout. By using ternaty operator, we can change which layout to render based on `signed` variable value.
+```jsx
+const Layout = signed ? DefaultLayout : AuthLayout;
+```
+By the way, the component `Route` will have the `component` property replaced by `render`, that will receive all the props from the page an directly return them into the component.
+```jsx
+return (
+    <Route
+    {...rest}
+    render={props => (
+      <Layout>
+        <Component {...props}>
+      </Layout>
+  )}/>
+);
 ```
 ___
