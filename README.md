@@ -11,6 +11,7 @@ ___
 - [Layouts for Pages](#layoutspages)
 - [Global Styles](#globalstyles)
 - [Root Import](#rootimport)
+- [Stylizing Authentication](#stylizingauth)
 
 ___
 
@@ -340,4 +341,60 @@ settings: {
 Create at the root folder: [jsconfig.json](jsconfig.json)
 
 This file will allow the VSCode to redirect us to the right path when "ctrl + left click" over the importation path.
+___
+
+## Stylizing Authentication
+<div id="stylizingauth">
+The SignIn and SignUp page are very similar, so the Auth layout will be used to stylizing this pages.
+
+First go to `SignIn` page [index.js](src/pages/SignIn/index.js)
+
+Start creating fragments inside the return, then create a form with two inputs, one button and one Link component
+
+Import the `Link` from `react-router-dom` and the `logo`
+
+```jsx
+import { Link } from 'react-router-dom';
+import logo from '~/assets/logo.svg';
+
+export default function SignIn() {
+  return (
+    <>
+      <img src={logo} alt="GoBarber" />
+      <form>
+        <input type="email" placeholder="Seu e-mail" />
+        <input type="password" placeholder="Sua senha" />
+        <button type="submit">Acessar</button>
+        <Link to="/register">Criar conta</Link>
+      </form>
+    </>
+  );
+}
+```
+Now on [src/pages/_layouts/auth/index.js](src/pages/_layouts/auth/index.js)
+
+Create a new Styled component `Container` to align the content on center, then place this component like this:
+```jsx
+<Wrapper>
+  <Container>
+    {children}
+  </Container>
+</Wrapper>
+```
+
+Go to [src/pages/_layouts/auth/styles.js](src/pages/_layouts/auth/styles.js) and make pertinent changes.
+
+Copy the changes made on `SignIn` page and paste on `SignUp` page [index.js](src/pages/SignUp/index.js), after that, just create a new input to the user name and the route of the Link component.
+```jsx
+<>
+  <img src={logo} alt="GoBarber" />
+  <form>
+    <input type="text" placeholder="Nome completo" />
+    <input type="email" placeholder="Seu e-mail" />
+    <input type="password" placeholder="Sua senha" />
+    <button type="submit">Criar conta</button>
+    <Link to="/">Já tenho login</Link>
+  </form>
+</>
+```
 ___
