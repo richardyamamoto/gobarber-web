@@ -14,6 +14,7 @@ ___
 - [Root Import](#rootimport)
 - [Stylizing Authentication](#stylizingauth)
 - [Using Unform](#unform)
+- [Validations](#validations)
 
 ___
 <div id="environment">
@@ -416,7 +417,7 @@ ___
 ## Using Unform
 To capture the produced input values, it's usual to create an state and used the property `onChange` to listen to this event.
 
-To avoid this procedure, we are going to use a lib from rocketseat called Unform [Documentation](). To install it
+To avoid this procedure, we are going to use a lib from rocketseat called Unform [Documentation](https://github.com/Rocketseat/unform). To install it
 ```bash
 yarn add @rocketseat/unform
 ```
@@ -443,6 +444,48 @@ function handleSubmit(data) {
   console.tron.log(data)
   // To ensure data is there.
 }
+```
+↑ back to: [Index](#index)
+___
+<div id="validations">
+
+## Validations
+
+We will use Yup to validate the input data (The same used on back-end).
+
+Intall Yup
+```bash
+yarn add yup
+```
+
+Then on SingIn page [index.js](src/pages/SignIn/index.js)
+
+Import Yup:
+```js
+import * as Yup from 'yup'
+```
+>Yup does not have an export default, that's why we use asterisk and `as`.
+
+Create a constant to receive the schema. Inside each validations we can put a personalized error message by passing a string.
+```js
+const schema = Yup.object().shape({
+    email: Yup.string()
+      .email('Insira um e-mail válido')
+      .required('E-mail é obrigatório'),
+    password: Yup.string().required('Senha é obrigatória'),
+  });
+```
+Now at SingUn page [index.js](src/pages/SignUp/index.js), repeat the same process and include the field `name` and the validation `.min(6)` on password.
+```js
+const schema = Yup.object().shape({
+  name: Yup.string().required('Insira seu nome completo'),
+  email: Yup.string()
+    .email('Insira um e-mail válido')
+    .required('E-mail é obrigatório'),
+  password: Yup.string()
+    .min(6, 'Senha mínima com 6 caracteres')
+    .required('Senha é obrigatória'),
+});
 ```
 ↑ back to: [Index](#index)
 ___
