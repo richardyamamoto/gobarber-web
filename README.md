@@ -10,6 +10,7 @@ ___
 - [Private Routes](#privateroutes)
 - [Layouts for Pages](#layoutspages)
 - [Global Styles](#globalstyles)
+- [Root Import](#rootimport)
 
 ___
 
@@ -288,4 +289,55 @@ import { createGlobalStyle } from 'styled-components';
 export default createGlobalStyle``;
 ```
 For further details [Global.js](src/styles/Global.js)
+___
+
+## Using Root Import
+<div id="rootimport">
+
+We will set another way to import files, components, etc.
+
+Install
+```bash
+yarn add customize-cra react-app-rewired -D
+```
+>Only for development ambience.
+
+Install Babel plugin:
+```bash
+yarn add babel-plugin-root-import -D
+```
+At the root folder create: [config-overrides.js](config-overrides.js)
+
+The normal import looks like:
+```js
+import AuthLayout from '../pages/_layouts/auth'
+```
+Now instead of using `'../'`, we are going to use `'~'` and this symbol will be the representation of `src` folder.
+
+On [package.json](package.json) replace the start, build and test from scripts:
+```json
+"scripts": {
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-scripts eject"
+  },
+```
+Intall Eslint plugin
+```bash
+yarn add eslint-import-resolver-babel-plugin-root-import -D
+```
+Make the following changes on:  [.eslintrc.js](.eslintrc.js)
+```js
+settings: {
+  "import/resolver": {
+    "babel-plugin-root-import": {
+      rootPathSuffix: "src"
+    },
+  },
+},
+```
+Create at the root folder: [jsconfig.json](jsconfig.json)
+
+This file will allow the VSCode to redirect us to the right path when "ctrl + left click" over the importation path.
 ___
