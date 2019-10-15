@@ -15,7 +15,7 @@ ___
 - [Stylizing Authentication](#stylizingauth)
 - [Using Unform](#unform)
 - [Validations](#validations)
-
+- [Configuring Redux](#redux)
 ___
 <div id="environment">
 
@@ -453,7 +453,7 @@ ___
 
 We will use Yup to validate the input data (The same used on back-end).
 
-Intall Yup
+Install Yup
 ```bash
 yarn add yup
 ```
@@ -464,7 +464,7 @@ Import Yup:
 ```js
 import * as Yup from 'yup'
 ```
->Yup does not have an export default, that's why we use asterisk and `as`.
+>Yup does not have an export default, that's why we use asterisk and `as` to import everything.
 
 Create a constant to receive the schema. Inside each validations we can put a personalized error message by passing a string.
 ```js
@@ -487,5 +487,132 @@ const schema = Yup.object().shape({
     .required('Senha é obrigatória'),
 });
 ```
+↑ back to: [Index](#index)
+___
+<div id="redux">
+
+## Configuring Redux, Redux Saga
+
+Install dependencies:
+```bash
+yarn add redux react-redux redux-saga reactotron-redux reactotron-redux-saga immer
+```
+
+Let's start configuring the Reactotron. Makes this changes at: [ReactotronConfig.js](src/config/ReactotronConfig.js)
+
+After that create the folder structure:
+```
+src
+  |_store
+      |_index.js
+      |_createStore.js
+      |_modules
+          |_auth
+          |   |_reducer.js
+          |   |_actions.js
+          |   |_sagas.js
+          |_rootReducer.js
+          |_rootSaga.js
+```
+Let's start by [auth/reducer.js](src/store/modules/auth/reducer.js)
+
+Reducer always going to be a function. This function receive as parameter the initial state and the action. Switch case is the flux controller that will run the right action.
+
+Before create the function, create a constant to receive the initial state.
+```js
+const INITIAL_STATE = {};
+export default function auth(state = INITIAL_STATE, action) {
+  switch(action.type) {
+    default:
+      return state;
+  }
+}
+```
+On [auth/sagas.js](src/store/modules/auth/sagas.js)
+
+Import the `all` method from `redux-saga/effects`, then export default it.
+```js
+import { all } from 'redux-saga/effects'
+
+export default all([]);
+```
+
+Then at [modules/rootReducer.js](src/store/modules/rootReducer.js)
+
+Import the method `combineReducers` and the reducer from auth. After that export by default the combineReducers with an array containing the reducers
+
+```js
+import { combineReducers } from 'redux';
+
+import auth from './auth/reducer';
+
+export default combineReducers([
+  auth,
+])
+```
+
+Go to [modules/rootSaga.js](src/store/modules/rootSaga.js)
+
+Import the `all` method from `redux-saga/effects` and the sagas from auth. Export by default the generator `function* rootSaga() {}`, returning the `all([])` method with the imported sagas inside.
+```js
+import { all } from 'redux-saga/effects';
+
+import auth from './auth/sagas.js';
+
+export default function* rootSaga() {
+  return yield all([auth]);
+}
+```
+
+Now we are going to configure the Redux and Redux Saga. Go to [store/index.js](src/store/index.js)
+
+Import the `createSagaMiddlewares` from `redux-saga`, import the `createStore` (the file we created before), `rootReducer` and `rootSaga`.
+
+Create a constant to receive the `crateSagaMiddlewares()` and another one to receive array of `sagaMiddleware`. Create anoter constant to receive the `createStore(rootReducer, middlewares)`. Then `sagaMiddleware.run(rootSaga)` and to finish, export default the store constant.
+
+We'll create `sagaMonitor` to check if a development environment.
+```js
+import createSagaMiddleware from 'redux-saga';
+import createStore from './createStore';
+
+import rootReducer from './modules/rootReducer';
+import rootSaga from './modules/rootSaga';
+
+const sagaMonitor =
+  process.env.NODE_ENV === 'development'
+    ? console.tron.createSagaMonitor()
+    : null;
+
+const sagaMiddleware = createSagaMiddleware({ sagaMonitor });
+
+const middlewares = [sagaMiddleware];
+
+const store = createStore(rootReducer, middlewares);
+
+sagaMiddleware.run(rootSaga);
+
+export default store;
+```
+Now on [createStore.js](src/store/createStore.js). Import the `createStore`, `compose` and `applyMiddleware` from `redux`. Inside the function check if we are at development environment. And make the following changes.
+```js
+import { createStore, compose, applyMiddleware } from 'redux';
+
+export default (reducers, middlewares) => {
+  const enhancer =
+    process.env.NODE_ENV === 'development'
+      ? compose(
+          console.tron.createEnhancer(),
+          applyMiddleware(...middlewares)
+        )
+      : applyMiddleware(...middlewares);
+
+  return createStore(reducers, enhancer);
+};
+```
+After configure everything, we have to go to [App.js](src/App.js) and import the `Provider` from `redux` and our `store`.
+>-  Provider must wrap all the other components and receive the propety `store` with our store.
+
+>-  Store must be imported after ReactotronConfig.
+
 ↑ back to: [Index](#index)
 ___
