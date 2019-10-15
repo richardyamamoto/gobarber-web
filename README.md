@@ -2,6 +2,7 @@
 
 This application is going to be developed aiming to studying the technologies:  Node.Js, ReactJS, Redux, Redux Saga, React Hooks and a bundle of libraries. This documentation will serve as a consult material.
 ___
+<div id="index">
 
 ## Index
 - [Environment Configuration](#environment)
@@ -12,11 +13,12 @@ ___
 - [Global Styles](#globalstyles)
 - [Root Import](#rootimport)
 - [Stylizing Authentication](#stylizingauth)
+- [Using Unform](#unform)
 
 ___
+<div id="environment">
 
 ## Environment Configuration
-<div id="environment">
 
 We use Eslint and Prettier to organize our code to become easier to read and have pattern when developing.
 
@@ -36,10 +38,12 @@ We use Eslint and Prettier to organize our code to become easier to read and hav
 - At the final of the precess, it will create a `.eslintrc.js` configuration file.
 - Create `.prettierrc` configuration file and with the right click of the mouse create the `.editorconfig`
 - Paste inside these files the commands on this link: [Configuration files](https://gist.github.com/richardyamamoto/d884e24dc86ccc636d2d69bac6660486)
+
+↑ back to: [Index](#index)
 ___
+<div id="routes">
 
 ## Setting Routes
-<div id="routes">
 Install React router dom
 ```bash
 yarn add react-router-dom
@@ -127,9 +131,11 @@ const history = createBrowserHistory();
 
 export default history;
 ```
+↑ back to: [Index](#index)
 ___
-## Configuring Reactotron
 <div id="configreactotron">
+
+## Configuring Reactotron
 Install the integration of Reactotron with ReactJS
 
 ```bash
@@ -220,10 +226,11 @@ export default function Routes() {
   );
 }
 ```
+↑ back to: [Index](#index)
 ___
+<div id="layoutspages">
 
 ## Pages Layouts
-<div id="layoutspages">
 Layouts works analog to templates.
 
 Create another folder inside `src/pages` named `_layouts`.
@@ -277,10 +284,11 @@ return (
   )}/>
 );
 ```
+↑ back to: [Index](#index)
 ___
+<div id="globalstyles">
 
 ## Global Styles
-<div id="globalstyles">
 Create [src/styles/Global.js](src/styles/Global.js)
 
 Import the method `createGlobalStyle` from Styled-components then export default
@@ -290,10 +298,12 @@ import { createGlobalStyle } from 'styled-components';
 export default createGlobalStyle``;
 ```
 For further details [Global.js](src/styles/Global.js)
+
+↑ back to: [Index](#index)
 ___
+<div id="rootimport">
 
 ## Using Root Import
-<div id="rootimport">
 
 We will set another way to import files, components, etc.
 
@@ -341,10 +351,12 @@ settings: {
 Create at the root folder: [jsconfig.json](jsconfig.json)
 
 This file will allow the VSCode to redirect us to the right path when "ctrl + left click" over the importation path.
+
+↑ back to: [Index](#index)
 ___
+<div id="stylizingauth">
 
 ## Stylizing Authentication
-<div id="stylizingauth">
 The SignIn and SignUp page are very similar, so the Auth layout will be used to stylizing this pages.
 
 First go to `SignIn` page [index.js](src/pages/SignIn/index.js)
@@ -397,4 +409,40 @@ Copy the changes made on `SignIn` page and paste on `SignUp` page [index.js](src
   </form>
 </>
 ```
+↑ back to: [Index](#index)
+___
+<div id="unform">
+
+## Using Unform
+To capture the produced input values, it's usual to create an state and used the property `onChange` to listen to this event.
+
+To avoid this procedure, we are going to use a lib from rocketseat called Unform [Documentation](). To install it
+```bash
+yarn add @rocketseat/unform
+```
+Now on [SignIn](src/pages/SignIn/index.js) import
+```js
+import { Form, Input } from '@rocketseat/unform'
+```
+Replace the `<form>` and `<input>` by the unform Components imported.
+
+The component `<Input>` must have the property `name`
+>The name could be the same as `type`. It will be the object key name.
+```jsx
+<Input name="email" type="email" placeholder="Seu e-mail" />
+```
+And `<Form>` the property `onSubmit`
+>This property waits for a function to execute.
+```jsx
+<Form onSubmit={handleSubmit}>
+```
+We need to create the function responsible to handle submit. So create a new function inside the function component, and it will receive the `data` from the form as parameter.
+```js
+function handleSubmit(data) {
+  // Block of code...
+  console.tron.log(data)
+  // To ensure data is there.
+}
+```
+↑ back to: [Index](#index)
 ___
