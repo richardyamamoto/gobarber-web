@@ -18,6 +18,7 @@ ___
 - [Configuring Redux](#redux)
 - [User Authentication](#authentication)
 - [Storing Profile](#storingprofile)
+- [Persisting Authentication](#persist)
 ___
 <div id="environment">
 
@@ -783,4 +784,93 @@ case `@auth/SIGN_IN_SUCCESS`:
 After that go to [rootReducer.js](src/store/modules/rootReducer.js) and import the `user/reducer.js` then on [rootSaga.js](src/store/modules/rootSaga.js) import the `user/sagas.js`
 
 ↑ back to: [Index](#index)
+___
+<div id="persist">
+
+## Persisting Authentication
+
+We are going persist the user data on the storage of the browser. To do that, install the lib `redux-persist`
+
+```bash
+yarn add redux-persist
+```
+Create [persistReducers](src/store/modules/persistReducers.js) at `src/store/modules/`.
+
+Make the importation of `storage` from `redux-persist/lib/storage` and the method `persistReducer` from `redux-persist`
+
+After that export default an arrow function with `reducers` as parameter. Inside the function body, create a const to allocate the `persistReducer()`
+
+`persistReducer()`:
+- 1st Parameter: Object of options
+  - `key`: Identification of the local storage.
+  - `storage`: The storage method we are going to use.
+  - `whitelist`: An array with allowed reducers.
+- 2nd Parameter: The reducers received on function parameters.
+
+Then return the `persistedReducer`
+```js
+import storage from 'redux-persist/lib/storage';
+import { persistReducer } from 'redux-persist';
+
+export default reducers => {
+  const persistedReducer = persistReducer({
+    key:'gobarber',
+    storage,
+    whitelist: ['user', 'auth'],
+  },
+    reducers
+  );
+  return persistedReducer;
+};
+```
+Now on [src/store/index.js](src/store/index.js)
+
+Import method `persistStore` from `redux-persist` and the `persistReducers.js` we created.
+
+On the constant `store`, wrap the `rootReducer` with `persistReducer` we created.
+```js
+const store = createStore(persistReducer(rootReducer), middlewares);
+```
+Then create constant `persistor` receiving the `persistStore` with `store` as parameter.
+```js
+const persistor = persistStore(store);
+```
+
+Instead of export default, export store and persistor
+```js
+export { store, persistor };
+```
+On [Route.js](src/routes/Route.js) and [App.js](src/App.js)
+
+Change the importation of `store` to:
+```js
+import { store } from './store';
+```
+The application will work again.
+
+At [App.js](src/App.js) yet, import `PersistGate` from `redux-persist/integration/react`
+
+The component `persistGate` (has the property `persistor` receiving the `persistor` exported from `./store`), must be placed after `<Provider store={store}>` and wrapping `<Router story={story}>`.
+
+```jsx
+import { store, persistor } from './store';
+
+function App() {
+  return (
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <Router history={history}>
+          <Routes />
+          <GlobalStyle />
+        </Router>
+      </PersistGate>
+    </Provider>
+  );
+}
+```
+>The `<PersistGate>` will render the elements only after get informations from local storage.
+
+↑ back to: [Index](#index)
+
+>To logout manually, go to the browser element inspector, search for application > Local Storage > Find key persist and clear.
 ___
