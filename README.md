@@ -19,6 +19,7 @@ ___
 - [User Authentication](#authentication)
 - [Storing Profile](#storingprofile)
 - [Persisting Authentication](#persist)
+- [Loading Authentication](#loadingauth)
 ___
 <div id="environment">
 
@@ -870,7 +871,78 @@ function App() {
 ```
 >The `<PersistGate>` will render the elements only after get informations from local storage.
 
-↑ back to: [Index](#index)
-
 >To logout manually, go to the browser element inspector, search for application > Local Storage > Find key persist and clear.
+
+↑ back to: [Index](#index)
+___
+<div id="loadingauth">
+
+## Loading Authentication
+
+Go to auth reducer -> [reducer.js](src/store/modules/auth/reducer.js)
+
+We are going to refactoring the switch case. The prouce is common to all the cases, so put it outside the cases, like this:
+```js
+export default function auth(state = INITIAL_STATE, action) {
+  return produce(state, draft => {
+    switch (action.type) {
+      case '@auth/SIGN_IN_REQUEST': {
+        draft.loading = true;
+        break;
+      }
+      case '@auth/SIGN_IN_SUCCESS': {
+        draft.token = action.payload.token;
+        draft.signed = true;
+        draft.loading = false;
+        break;
+      }
+      case '@auth/SIGN_FAILURE': {
+        draft.loading = false;
+        break;
+      }
+      default:
+    }
+  });
+}
+```
+Go to auth [auth/sagas.js](src/store/modules/auth/sagas.js) put a try catch wrapping the whole `singIn` function. On catch put the `signFailure`
+```js
+export function* signIn({ payload }) {
+  try {
+    const { email, password } = payload;
+
+    const response = yield call(api.post, 'sessions', {
+      email,
+      password,
+    });
+
+    const { token, user } = response.data;
+
+    if (!user.provider) {
+      console.tron.error('Usuário não é prestador');
+      yield put(signFailure());
+      return;
+    }
+
+    yield put(signInSuccess(token, user));
+
+    history.push('/dashboard');
+  } catch (err) {
+    yield put(signFailure());
+  }
+}
+```
+>The `signFailure()` will change loading to false.
+
+On SignIn page -> [SignIn.js](src/pages/SignIn/index.js)
+
+Import the `useSelector` to recover the loading state from auth.
+
+Then on button, make a ternary operation to render according to `loading` value.
+```jsx
+import {..., useSelector} from 'react-redux';
+...
+<button type="submit">{loading ? 'Carregando...' : 'Acessar'}</button>
+```
+↑ back to: [Index](#index)
 ___
