@@ -16,6 +16,7 @@ ___
 - [Using Unform](#unform)
 - [Validations](#validations)
 - [Configuring Redux](#redux)
+- [Authentication](#authentication)
 ___
 <div id="environment">
 
@@ -613,6 +614,123 @@ After configure everything, we have to go to [App.js](src/App.js) and import the
 >-  Provider must wrap all the other components and receive the propety `store` with our store.
 
 >-  Store must be imported after ReactotronConfig.
+
+↑ back to: [Index](#index)
+___
+<div id="authentication">
+
+## User Authentication
+
+Install Axios to handle the API consumption.
+```bash
+yarn add axios
+```
+At folder services create [api.js](src/services/api.js). Then put this inside:
+```js
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:<PORT>',
+});
+
+export default api;
+```
+Let's create some actions on -> [actions.js](src/store/modules/auth/actions.js):
+- `signInRequest(email, password)`;
+- `signInSuccess(token, user)`;
+- `signFailure()`;
+```js
+export function signInRequest(email, password) {
+  return {
+    type: '@auth/SIGN_IN_REQUEST',
+    payload: { email, password },
+  };
+}
+
+export function signInSuccess(token, user) {
+  return {
+    type: '@auth/SIGN_IN_SUCCESS',
+    payload: { token, user },
+  };
+}
+
+export function signFailure() {
+  return {
+    type: '@auth/SIGN_FAILURE',
+  };
+}
+```
+Then on [sagas.js](src/store/modules/auth/sagas.js)
+
+Import the methods `takeLatest`, `call`, `put` from `redux-saga/effects`, import the `api` from services, `history` from services too and method `signInSuccess` from our actions
+
+Inside the `export default` put the `takeLatest()` inside the array, this method waits as 1st parameter the action type dispatched and as 2nd the function to be executed.
+
+Now we create the function `signIn`. By unsctructuring the parameters of this function, we can recover the `payload` property dispatched from the action.
+```js
+import { all, takeLatest, call, put } from 'redux-saga/effects';
+import api from '~/services/api';
+import history from '~/services/history';
+import { signInSuccess } from './actions';
+
+export function signIn({payload}){
+  const { email, password } = payload;
+  const response = yield call(api.get, 'sessions', {
+    email,
+    password,
+  })
+  const { token, user } = response.data;
+  if(!user.provider) {
+    console.tron.error('Usuário não é prestador');
+  }
+  yield put(signInSuccess(token, user));
+  history.push('/dashboard');
+}
+
+export default all([takeLatest('@auth/SIGN_IN_REQUEST', signIn)])
+```
+After that go to [SignIn/index.js](src/pages/SignIn/index.js)
+
+Import the `useDispatch` from `react-redux` and `signInRequest` from `actions.js`
+```js
+import { useDispatch } from 'react-redux';
+import { signInRequest } from '~/store/modules/auth/actions';
+```
+Before the function `handleSubmit()`, create a const become the method `useDispatch()`.
+
+Now on the function `handleSubmit()`, unstructure the parameter to get the `{ email, password }` from `data`, then use the `dispatch(signInReques(email, password))`
+```js
+...
+const dispatch = useDispatch();
+function handleSubmit({ email, password }) {
+  dispatch(signInRequest(email, password));
+  // Just to check
+  console.tron.log(email, password);
+}
+```
+Now go to [auth/reducer.js](src/store/modules/auth/reducer.js)
+
+Import the produce from `immer`
+```js
+import produce from 'immer';
+```
+Then create new case and manipulate the data coming from action.
+```js
+case '@auth/SIGN_IN_SUCCESS':
+  return produce(state, draft => {
+    draft.token = action.payload.token;
+    draft.signed = true;
+  })
+```
+Finally go to [Route.js](src/routes/Route.js), import `store` and make some changes on constant `signed`:
+```js
+import store from '~/store';
+```
+Use the `.getState()` to get any state from store.
+```js
+const { signed } = store.getState().auth;
+```
+Try to Sign in with provider user.
 
 ↑ back to: [Index](#index)
 ___
