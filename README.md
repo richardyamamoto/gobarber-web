@@ -16,7 +16,8 @@ ___
 - [Using Unform](#unform)
 - [Validations](#validations)
 - [Configuring Redux](#redux)
-- [Authentication](#authentication)
+- [User Authentication](#authentication)
+- [Storing Profile](#storingprofile)
 ___
 <div id="environment">
 
@@ -635,6 +636,8 @@ const api = axios.create({
 
 export default api;
 ```
+><PORT> Must be the port used by API
+
 Let's create some actions on -> [actions.js](src/store/modules/auth/actions.js):
 - `signInRequest(email, password)`;
 - `signInSuccess(token, user)`;
@@ -731,6 +734,53 @@ Use the `.getState()` to get any state from store.
 const { signed } = store.getState().auth;
 ```
 Try to Sign in with provider user.
+
+↑ back to: [Index](#index)
+___
+<div id="storingprofile">
+
+## Storing Profile
+
+We are going to store the user in session.
+
+Create a new reducer to store and manage the user profile.
+
+At `store/module`, create:
+```
+ src
+  |_store
+      |_modules
+          |_user
+              |_reducer.js
+              |_actions.js
+              |_sagas.js
+```
+At [sagas.js](src/store/modules/user/sagas.js)
+
+Import the `all` method from `redux-saga/effects` and export default `all`
+```js
+import { all } from 'redux-saga/effects';
+
+export default all([]);
+```
+Then on [reducer.js](src/store/modules/user/reducer.js). Create a structure similar to [auth/reducer.js](src/store/modules/auth/reducer.js)
+
+>One Reducer can listen to another actions from other modules.
+
+Edit the `INITIAL_STATE` to receive the user profile.
+
+Then on switch case, change the return of the `produce`:
+```js
+const INITIAL_STATE = {
+  profile: null,
+}
+...
+case `@auth/SIGN_IN_SUCCESS`:
+  return produce(state, draft => {
+    draft.profile = action.payload.user;
+  })
+```
+After that go to [rootReducer.js](src/store/modules/rootReducer.js) and import the `user/reducer.js` then on [rootSaga.js](src/store/modules/rootSaga.js) import the `user/sagas.js`
 
 ↑ back to: [Index](#index)
 ___
