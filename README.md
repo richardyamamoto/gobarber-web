@@ -20,6 +20,8 @@ ___
 - [Storing Profile](#storingprofile)
 - [Persisting Authentication](#persist)
 - [Loading while Authentication](#loadingauth)
+- [Showing off Toasts](#toasts)
+- [Registry on Application](#registry)
 ___
 <div id="environment">
 
@@ -946,6 +948,7 @@ import {..., useSelector} from 'react-redux';
 ```
 ↑ back to: [Index](#index)
 ___
+<div id="toasts">
 
 ## Showing off Toasts
 
@@ -977,4 +980,61 @@ Navigate to sagas.js -> [src/store/modules/auth/sagas.js](src/store/modules/auth
 import { toast } from 'react-toastify';
 ```
 Then put the `toast.error('Mensagem de erro')`
+
+↑ back to: [Index](#index)
+___
+<div id="registry">
+
+## Registry on Application
+
+First create the action `signInRequest()` on [auth/actions.js](src/store/modules/auth/actions.js)
+
+```js
+export function signInRequest(name, email, password) {
+  return {
+    type: '@auth/SIGN_UP_REQUEST',
+    payload: { name, email, password },
+  }
+}
+```
+Go to the `singUp` page -> [signUp/index.js](src/pages/SignUp/index.js)
+
+Import the `useDispatch` from `react-redux` then import the actions. Create a constant to receive the `useDispatch()`. Inside the handleSubmit put the dispatch with input date.
+```js
+import { useDispatch } from 'react-redux';
+import { signInRequest } from '~/store/modules/auth/actions'
+...
+function handleSubmit({name, email, password}) {
+  dispatch(signInRequest(name, email, password));
+}
+```
+Then on [auth/sagas.js](src/store/modules/auth/sagas.js)
+
+Create a generator `export function* signUp()` receiving as parameter the `{ payload }`, put inside a try catch the unstructuring of `payload`. Call the api with method post on route 'users' with the object as third parameter.
+```js
+export function* signUp({ payload }) {
+  try {
+    const { name, email, password } = payload;
+    yield call(api.post, 'users', {
+      name,
+      email,
+      password,
+      provider: true,
+    });
+    history.push('/');
+  }catch(err) {
+    toast.error('Falha no cadastro, verifique seus dados.');
+  }
+}
+```
+Add on export default the new generator.
+```js
+export default all([
+  ...,
+  takeLatest('@auth/SIGN_UP_REQUEST', signUp),
+])
+```
+Create a demo user and try to log in.
+
+↑ back to: [Index](#index)
 ___
