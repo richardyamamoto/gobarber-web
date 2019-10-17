@@ -19,7 +19,7 @@ ___
 - [User Authentication](#authentication)
 - [Storing Profile](#storingprofile)
 - [Persisting Authentication](#persist)
-- [Loading Authentication](#loadingauth)
+- [Loading while Authentication](#loadingauth)
 ___
 <div id="environment">
 
@@ -877,7 +877,7 @@ function App() {
 ___
 <div id="loadingauth">
 
-## Loading Authentication
+## Loading while Authentication
 
 Go to auth reducer -> [reducer.js](src/store/modules/auth/reducer.js)
 
@@ -945,4 +945,36 @@ import {..., useSelector} from 'react-redux';
 <button type="submit">{loading ? 'Carregando...' : 'Acessar'}</button>
 ```
 ↑ back to: [Index](#index)
+___
+
+## Showing off Toasts
+
+We are going to use [react-toastify](https://github.com/fkhadra/react-toastify)
+
+Install Toastify running
+```bash
+yarn add react-toastify
+```
+On [App.js](src/App.js) import the `ToastContainer` from `react-toastify` and put the component inside `Router` component.
+```js
+import { ToastContainer } from 'react-toastify';
+...
+<Router history={history}>
+  <Routes />
+  <GlobalStyle />
+  <ToastContainer autoClose={3000} />
+</Router>
+```
+>`autoClose` property is self explanatory.
+
+Go to global styles ->[src/styles/Global.js](src/styles/Global.js) and import the toast styles.
+```js
+import 'react-toastify/dist/ReactToastify.css'
+```
+
+Navigate to sagas.js -> [src/store/modules/auth/sagas.js](src/store/modules/auth/sagas.js), import `toast` from `react-toastify`
+```js
+import { toast } from 'react-toastify';
+```
+Then put the `toast.error('Mensagem de erro')`
 ___
