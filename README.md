@@ -22,6 +22,7 @@ ___
 - [Loading while Authentication](#loadingauth)
 - [Showing off Toasts](#toasts)
 - [Registry on Application](#registry)
+- [Authenticated Requisition](#authreq)
 ___
 <div id="environment">
 
@@ -1036,5 +1037,51 @@ export default all([
 ```
 Create a demo user and try to log in.
 
+↑ back to: [Index](#index)
+___
+<div id="authreq">
+
+## Authenticated Requisition
+
+Go to [auth/sagas.js](src/store/modules/auth/sagas.js)
+
+Inside `signIn()` before `yield put()` put
+```js
+api.defaults.headers.Authorization = `Bearer ${token}`;
+
+yield put(signInSuccess(token, user));
+```
+Go to [Dashboard/index.js](src/pages/Dashboard/index.js) and import the `api` services.
+
+```js
+import api from '~/services/api';
+```
+Put `api.get('appointments')`
+
+When reloading the application, the token will not be there.
+
+We need to persist it.
+
+Go to [auth/sagas.js](src/store/modules/auth/sagas.js) and listen to `persist/REHYDRATE` and call a new function we'll create.
+
+```js
+export default all([
+  takeLatest('persist/REHYDRATE', setToken),
+  ...
+])
+```
+
+Create the simple function `setToken()`:
+```js
+export function setToken({ payload }) {
+  if(!payload) return;
+
+  const { token } = payload.auth;
+
+  if(token){
+    api.defaults.headers.Authorization = `Bearer ${token}`
+  }
+}
+```
 ↑ back to: [Index](#index)
 ___
