@@ -23,6 +23,7 @@ ___
 - [Showing off Toasts](#toasts)
 - [Registry on Application](#registry)
 - [Authenticated Requisition](#authreq)
+- [Configuring Header](#cfgheader)
 ___
 <div id="environment">
 
@@ -975,7 +976,7 @@ Go to global styles ->[src/styles/Global.js](src/styles/Global.js) and import th
 ```js
 import 'react-toastify/dist/ReactToastify.css'
 ```
-
+v
 Navigate to sagas.js -> [src/store/modules/auth/sagas.js](src/store/modules/auth/sagas.js), import `toast` from `react-toastify`
 ```js
 import { toast } from 'react-toastify';
@@ -1083,5 +1084,19 @@ export function setToken({ payload }) {
   }
 }
 ```
+↑ back to: [Index](#index)
+___
+<div id="cfgheader">
+
+## Configuring Header
+
+The header isn't a component of a specific page. So we'll create it isolated to reuse it in other pages.
+
+Create [src/components/Header/index.js](src/components/Header/index.js)
+
+Then create [Header/styles.js](src/components/Header/styles.js)
+
+As we are using layouts, import and put the Header component before `{children}`. For further details -> [_layouts/default/index.js](src/pages/_layouts/default/index.js)
+
 ↑ back to: [Index](#index)
 ___
