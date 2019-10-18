@@ -24,6 +24,7 @@ ___
 - [Registry on Application](#registry)
 - [Authenticated Requisition](#authreq)
 - [Configuring Header](#cfgheader)
+- [Stylizing Notifications Component](#stylizingnotifications)
 ___
 <div id="environment">
 
@@ -1097,6 +1098,104 @@ Create [src/components/Header/index.js](src/components/Header/index.js)
 Then create [Header/styles.js](src/components/Header/styles.js)
 
 As we are using layouts, import and put the Header component before `{children}`. For further details -> [_layouts/default/index.js](src/pages/_layouts/default/index.js)
+
+↑ back to: [Index](#index)
+___
+<div id="stylizingnotifications">
+
+## Stylizing Notifications Component
+
+Install the react-icons
+```bash
+yarn add react-icons
+```
+At `src/components` create [Notifications/index.js](src/components/Notifications/index.js) and [Notifications/styles.js](src/components/Notifications/styles.js).
+
+[Notifications/index.js](src/components/Notifications/index.js) -> Use component `<Container>`, create `<Badge>`, import the `MdNotifications`.
+
+The `Badge` will have a property `hasUnread`
+
+>`hasUnread` will have a visual treatment on -> [Notifications/styles.js](src/components/Notifications/styles.js).
+```jsx
+export default function Notifications() {
+  return (
+    <Container>
+      <Badge hasUnread>
+        <MdNotifications color='#7951c1' size={20}>
+      </Badge>
+    </Container>
+  )
+}
+```
+Import the component `<Notifications>` at [Header/index.js](src/components/Header/index.js) before `<Profile>`
+
+Stylize the `Notifications` component.
+
+Import `css` from `styled-components`.
+>`css` allow to use css based on information.
+```
+${props => props.hasUnread && css`
+    &::after {
+      position: relative;
+      content: '';
+      ...
+    }
+`;}
+```
+Create the `<NotificationList>`, `<Notification>` and stylize it.
+
+The element `<Notification>` have property `unread`.
+
+Create the component `<Scroll>` and put it wrapping the `<Notification>` and on list of `styles`
+```jsx
+export default function Notifications() {
+  return (
+    <Container>
+      <Badge hasUnread>
+        <MdNotifications color="#7159c1" size={20} />
+      </Badge>
+      <NotificationList>
+        <Scroll>
+          <Notification unread>
+            <p>Você possui um novo agendamento para amanhã</p>
+            <time>há 2 dias atrás</time>
+            <button type="button">Marcar como lida</button>
+          </Notification>
+        </Scroll>
+      </NotificationList>
+    </Container>
+```
+
+Install `react-perfect-scrollbar` to handle the scrollbar easier.
+
+[Documentation](https://github.com/goldenyz/react-perfect-scrollbar)
+```bash
+yarn add react-perfect-scrollbar
+```
+Copy:
+```js
+import 'react-perfect-scrollbar/dist/css/styles.css';
+```
+and paste on Global style -> [Global.js](src/styles/Global.js)
+
+Then on [Notifications/styles.js](src/components/Notifications/styles.js)
+
+Import and put is on the `Scroll` component before `Notification`.
+```jsx
+import PerfectScrollbar from 'react-perfect-scrollbar';
+...
+export const Scroll = styled(PerfectScrollbar)`
+  max-height: 260px;
+  padding: 5px 15px;
+`;
+```
+Go back to `Notification` style component and chenage the `padding`.
+```
+export const Notification = styled.div`
+  ...
+  padding: 15px 5px
+`;
+```
 
 ↑ back to: [Index](#index)
 ___
