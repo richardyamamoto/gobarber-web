@@ -29,6 +29,7 @@ This application is going to be developed aiming to studying the technologies: N
 - [Configuring Header](#cfgheader)
 - [Stylizing Notifications Component](#stylizingnotifications)
 - [Notifications](#notifications)
+- [Profile Page](#profilepage)
 
 ---
 
@@ -1570,3 +1571,48 @@ To finish, we don't need to show the button if there is no notification unreaded
   </button>
 )}
 ```
+↑ back to: [Index](#index)
+___
+<div id="profilepage">
+
+## Profile Page
+
+At `src/pages/Profile` create the [Profile/styles.js](src/pages/Profile/styles.js)
+
+Back to [Profile/index.js](src/pages/Profile/index.js), import `Form` and `Input` from `@rocketseat/unform` and `useSelector` from `react-redux`.
+
+Place the Form component wrapping the inputs and the submit button. After that we can create a constant to receive the user profile using `useSelector`.
+
+Put the `profile` at the `initialData` Form property.
+
+Then create the `handleSubmit()` receiving `data` as parameter from `Form`.
+
+```js
+import { useSelector } from 'react-redux';
+import { Form, Input } from '@rocketseat/unform';
+
+export default function Profile() {
+  const profile = useSelector(state => state.user.profile);
+
+  function handleSubmit(data) {}
+
+  return (
+    <Container>
+      <Form initialData={profile} onSubmit={handleSubmit}>
+        <Input name="name" placeholder="Nome completo" />
+        <Input name="email" placeholder="Seu e-mail" />
+        <hr />
+        <Input name="oldPassword" placeholder="Sua senha atual" />
+        <Input name="password" placeholder="Nova senha" />
+        <Input name="confirmPassword" placeholder="Confirmar nova senha" />
+        <button type="submit">Atualizar perfil</button>
+      </Form>
+      <button>Sair do GoBarber</button>
+    </Container>
+  )
+}
+```
+>The property `initialData` of `<Form>` component, allow auto-complete field with the object recovered from user profile state.
+
+↑ back to: [Index](#index)
+___
