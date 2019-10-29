@@ -30,6 +30,7 @@ This application is going to be developed aiming to studying the technologies: N
 - [Stylizing Notifications Component](#stylizingnotifications)
 - [Notifications](#notifications)
 - [Profile Page](#profilepage)
+- [Update Profile](#updateprofile)
 
 ---
 
@@ -1614,5 +1615,112 @@ export default function Profile() {
 ```
 >The property `initialData` of `<Form>` component, allow auto-complete field with the object recovered from user profile state.
 
+↑ back to: [Index](#index)
+___
+<div id="updateprofile">
+
+## Update Profile
+
+Now we are going to update the user profile. We are going to start creating new actions at [src/store/modules/user/actions.js](src/store/modules/user/actions.js)
+
+Then create three action functions `updateProfileRequest()`, `updateProfileSuccess` and `updateProfileFailure()`.
+```js
+export function updateProfileRequest(data) {
+  return({
+    type: '@user/UPDATE_PROFILE_REQUEST',
+    payload: { data },
+  })
+}
+export function updateProfileSuccess(profile) {
+  return({
+    type: '@user/UPDATE_PROFILE_SUCCESS',
+    payload: { profile },
+  })
+}
+export function updateProfileRequest() {
+  return({
+    type: '@user/UPDATE_PROFILE_FAILURE',
+  })
+}
+```
+After that we are going to listen the request at [src/store/modules/user/sagas.js](src/store/modules/user/sagas.js)
+
+Import
+```js
+import { takeLatest, call, put, all } from 'redux-saga';
+import { toast } from 'react-toastify';
+import api from '~/services/api';
+```
+
+At the default export array, insert the `takeLatest()`. Put the action type as first parameter and the function(generator) that we are going to create.
+```js
+export default all([
+  takeLatest('@user/UPDATE_PROFILE_REQUEST', updateProfile)
+])
+```
+The function we are going to create, will receive the payload as parameter and we can recover this data by unstructuring the object.
+
+Create a constant to receive `name`, `email` and the rest we will place at a variable `rest` with rest operator.
+
+Create other const to combine objects with `Object.assign()`. It will put together the password information if it exists. (Or we can use spread operator)
+
+Create another constant to receive the api call (don't forget the `yield`).
+```js
+export function* updateRequest({ payload }) {
+  const { name, email, ...rest } = payload.data;
+
+  const profile = Object.assign(
+    {name, email},
+    rest.oldPassword ? rest : {}
+  )
+
+  const response = yield call(api.put, 'users', profile);
+}
+```
+or
+```js
+export function* updateRequest({ payload }) {
+  try {
+    const {name, email, ...rest} = payload.data;
+
+    const profile = {
+      name,
+      email,
+      ...(rest.oldPassword ? rest : {});
+    }
+
+    const response = yield call(api.put, 'users', profile);
+    toast.success('Perfial atualizado com sucesso!');
+
+    yield put(updateProfileSuccess(response.data))
+  }catch(err) {
+    yield put(updateProfileFailure());
+    toast.error('Erro ao atualizar perfil, confira seus dados');
+  }
+}
+```
+
+We have to dispatch the request action from Profile page to sagas listen to it. Go to [src/pages/Profile/index.js](src/pages/Profile/index.js), then import the `useDispatch` from `react-redux` and the `updateProfileRequest` from user actions, after that put the method to a constant and inside the function `handleSubmit` dispatch the action.
+```js
+import { ..., useDispatch } from 'react-redux';
+import { updateProfileRequest } from '~/store/modules/user/actions';
+...
+
+// Inside the function component
+const dispatch = useDispatch();
+function handleSubmit (data) {
+  dispatch(updateProfileRequest(data));
+}
+```
+
+Then we hava to listen our sagas on our user reducer [src/store/modules/user/reducer.js](src/store/modules/user/reducer.js)
+
+Create a new case and include the profile received from our saga.
+```js
+case '@user/UPDATE_PROFILE_SUCCESS': {
+  draft.profile = action.payload.profile;
+  break;
+}
+```
 ↑ back to: [Index](#index)
 ___
